@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && cp CNAME ./dist",
     "preview": "vite preview",
     "push": "git add dist -f && git commit -m \"adding dist\" && git subtree push --prefix dist origin gh-pages"
   },
