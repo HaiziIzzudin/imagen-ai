@@ -1,0 +1,249 @@
+:root {
+  --dark-gradient: linear-gradient(90deg, #000032 0%, rgb(50, 0, 50) 100%);
+  --light-gradient: linear-gradient(90deg, #eaeaff 0%, #ffeaff 100%);
+  // --img-reveal: linear-gradient(100deg, rgba(255,136,255,1) 0%, rgba(136,136,255,1) 21%, rgba(255,136,255,1) 42%, rgba(136,136,255,0.75) 65%, rgba(169,136,255,0.5) 75%, rgba(210,136,255,0.25) 85%, rgba(255,136,255,0) 95%);
+  // --img-reveal: linear-gradient(100deg, rgba(255,136,255,1) 0%, rgba(136,136,255,1) 15%, rgba(255,136,255,1) 30%, rgba(136,136,255,1) 45%, rgba(255,136,255,1) 60%, rgba(136,136,255,0.75) 69%, rgba(169,136,255,0.5) 78%, rgba(210,136,255,0.25) 87%, rgba(255,136,255,0) 95%);
+  // --img-reveal: linear-gradient(100deg, rgba(136,136,255,1) 0%, rgba(255,136,255,1) 20%, rgba(136,136,255,1) 40%, rgba(255,136,255,1) 60%, rgba(136,136,255,0.75) 69%, rgba(169,136,255,0.5) 78%, rgba(210,136,255,0.25) 87%, rgba(255,136,255,0) 95%);
+  --img-reveal: linear-gradient(120deg, rgba(136,136,255,1) 0%, rgba(255,136,255,1) 20%, rgba(136,136,255,1) 40%, rgba(255,136,255,1) 60%, rgba(210,136,255,0.7512254901960784) 68%, rgba(169,136,255,0.5) 75%, rgba(136,136,255,0.25262605042016806) 83%, rgba(136,136,255,0) 90%);
+  --matter-primary-rgb: 255,234,255;
+  --matter-secondary-rgb: 255,234,255;
+  --matter-onsurface-rgb: 255,255,255;
+  --bezier-curve: cubic-bezier(0.2, 0, 0.07, 1);
+}
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background: var(--dark-gradient);
+  margin: 0; padding: 0;
+  
+  // BEGIN CODE OF CENTER ELEMENT ON CANVAS
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh);
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 10px;
+  // END CODE OF CENTER ELEMENT ON CANVAS
+}
+h1,h2,h3,p {
+  color: transparent;
+  background: var(--light-gradient);
+  background-clip: text;
+  text-align: center;
+  // margin-top: 0;
+}
+h3 {
+  margin-top: 60px;
+}
+footer { 
+  color: #eaeaff; 
+  text-align: center;
+  font-size: 12px;
+}
+main {
+  // FOR ANIMATION
+  // By default is hidden
+  display: none;
+  opacity: 0;
+  transform: translateY(100px);
+  transition-timing-function: cubic-bezier(0.2, 0, 0.07, 1);
+  
+  margin: auto 0;
+  .fa-solid {
+    color: rgb(50, 0, 50);
+  }
+  .matter-button-unelevated {
+    display: block;
+    font-size: 30px;
+    margin-left: 5px;
+    margin-top: 6px;
+    height: 100px;
+  }
+  .matter-textfield-outlined {
+    // padding-top: 0;
+    width: 100%;
+    max-width: 100%;
+    height: 100px;
+  }
+  textarea { overflow: auto; }
+
+  .userinput {
+    display: flex;
+    align-items: start;
+  }
+}
+
+
+.div-checkboxes {
+  display: flex;
+  justify-content: end;
+  margin-top: 10px;
+
+  --matter-onsecondary-rgb: 0,0,0;
+}
+
+
+#screen2, #screen3 {
+  // FOR ANIMATION
+  // By default is hidden
+  display: none;
+  opacity: 0;
+  transform: translateY(100px);
+  transition-timing-function: cubic-bezier(0.2, 0, 0.07, 1);
+
+  margin: auto 0;
+
+  progress {
+    display: block;
+    margin: 0 auto;
+  }
+}
+#screen3 {
+  .button-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 40px;
+    & :first-child { margin-left: 0px; }
+    button {
+      margin: 5px 5px;
+      display: block;
+      // margin: 0 auto 100px;
+      color: #000032;
+      text-align: center;
+    }
+  }
+  .fa-solid {
+    margin-right: 10px;
+  }
+}
+
+#img_result {
+  border-radius: 15px;
+  overflow: hidden;
+  img {
+    display: block;
+    width: 100%;
+  }
+  #gradient-overlay {
+    width: 4000px;
+    height: 1024px;
+    position: relative;
+    margin-top: -1024px;
+    z-index: 100;
+    background: var(--img-reveal);
+    // background-color: black;
+  }
+  .gradient-overlay-show {
+    margin-left: -4000px;
+    transition-duration: 3s;
+  }
+}
+
+
+#dreamy,#dreamy2 {
+  z-index: -10;
+  position: fixed;
+  font-weight: 100;
+  text-wrap: nowrap;
+  p { margin: 0; }
+}
+#dreamy {
+  font-size: 400px;
+  top: -100px; left: 0;
+  animation: dreamy 20s linear infinite;
+}
+#dreamy2 {
+  font-size: 600px;
+  bottom: -100px; right: 0;
+  transform: translateX(2000px);
+  opacity: 0;
+  animation: dreamy2 20s linear 0.53s infinite;
+}
+
+#dreamy-group { opacity: 0; display: none;} // default
+.dreamy-group-show { 
+  opacity: 1 !important; display: initial !important;
+  transition-duration: 1s;
+}
+
+
+
+
+
+// animation for dreamy
+@keyframes dreamy {
+  0% { opacity: 0; }
+  5% { opacity: 0.2; }
+  10% { opacity: 0.1; }
+  15% { opacity: 0.2; }
+  20% { opacity: 0.1; }
+  25% { opacity: 0.2; }
+  30% { opacity: 0.1; }
+  35% { opacity: 0.2; }
+  40% { opacity: 0.1; }
+  45% { opacity: 0.2; }
+  50% { opacity: 0.1; }
+  55% { opacity: 0.2; }
+  60% { opacity: 0.1; }
+  65% { opacity: 0.2; }
+  70% { opacity: 0.1; }
+  75% { opacity: 0.2; }
+  80% { opacity: 0.1; }
+  85% { opacity: 0.2; }
+  90% { opacity: 0.1; }
+  95% { opacity: 0.2; }
+  100% { opacity: 0; transform: translateX(-1000px); }
+}
+@keyframes dreamy2 {
+  0% { opacity: 0; }
+  5% { opacity: 0.2; }
+  10% { opacity: 0.1; }
+  15% { opacity: 0.2; }
+  20% { opacity: 0.1; }
+  25% { opacity: 0.2; }
+  30% { opacity: 0.1; }
+  35% { opacity: 0.2; }
+  40% { opacity: 0.1; }
+  45% { opacity: 0.2; }
+  50% { opacity: 0.1; }
+  55% { opacity: 0.2; }
+  60% { opacity: 0.1; }
+  65% { opacity: 0.2; }
+  70% { opacity: 0.1; }
+  75% { opacity: 0.2; }
+  80% { opacity: 0.1; }
+  85% { opacity: 0.2; }
+  90% { opacity: 0.1; }
+  95% { opacity: 0.2; }
+  100% { opacity: 0; transform: translateX(0px); }
+}
+
+
+
+.anim-block-show {display: block !important;}
+.anim-show {
+  transform: translateY(0px) !important;
+  transition-duration: 1s !important;
+  opacity: 1 !important;
+}
+.anim-exit {
+  transform: translateY(-25px) !important;
+  transition-duration: 0.2s !important;
+  opacity: 0 !important;
+}
+
+
+@media (max-width: 800px) {
+  body { min-height: calc(100vh - 60px); }
+  h3 { margin-top: 20px; }
+  #download { margin: 0 auto; }
+
+  #dreamy {
+    font-size: 200px;
+    top: 0px;
+  }
+  #dreamy2 {
+    font-size: 400px;
+    bottom: 0px;
+  }
+}
