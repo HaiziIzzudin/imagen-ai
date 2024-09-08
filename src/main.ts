@@ -42,7 +42,7 @@ function pageTransition(oldpage:string, newpage:string) {
 
 function postRequest(prompt:string) {
   var settings = {
-    "url": "http://185.44.64.239:8000/generate/",
+    "url": "https://fastapi-traefik.iziizz.com/generate/",
     "method": "POST",
     "timeout": 0,
     "headers": {
