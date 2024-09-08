@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link href="https://res.cloudinary.com/finnhvman/raw/upload/matter/matter-0.2.2.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <script type="module" crossorigin src="/assets/index-C-k4aOZG.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DerXbEMd.css">
+</head>
+<body style="visibility: hidden;">
+  
+  <!-- ======= -->
+  <!-- SCREENS -->
+  <!-- ======= -->
+
+  <main id="screen1" class="">
+    <h1>✨ Haizi's ✨<br>AI Image Generator</h1>
+    <div class="userinput">
+      <label class="matter-textfield-outlined">
+        <!-- <input placeholder=" "/> -->
+        <textarea placeholder=""></textarea>
+        <span>Prompt</span>
+      </label>
+      <button type="button" id="submit" class="matter-button-unelevated" disabled>
+        <i class="fa-solid fa-circle-chevron-right"></i>
+      </button>
+    </div>
+    <div class="div-checkboxes">
+      <label class="matter-checkbox matter-secondary">
+        <input type="checkbox" id="devmode" checked>
+        <span style="font-family: monospace;">Developer Mode</span>
+      </label>
+    </div>
+  </main>
+
+
+  <div id="screen2">
+    <h2>Generating...</h2>
+    <progress class="matter-progress-linear"></progress>
+    <p>Give us 60 seconds or so... ⏳</p>
+  </div>
+
+
+  <div id="screen3">
+    <h3>✨ Your AI generated image is here! ✨</h3>
+    <div id="img_result">
+      <img id="img_output">
+      <div id="gradient-overlay" class=""></div>
+    </div>
+    <p>Please manual save it to your device, as this image will not be saved automatically.</p>
+    <span class="button-group">
+      <button type="button" id="download" class="matter-button-unelevated">
+        <i class="fa-solid fa-download"></i>Download
+      </button>
+      <button type="button" id="regenerate" class="matter-button-unelevated">
+        <i class="fa-solid fa-rotate-left"></i>Regenerate
+      </button>
+      <button type="button" id="adjust-prompt" class="matter-button-unelevated">
+        <i class="fa-solid fa-pen-to-square"></i>Adjust Prompt
+      </button>
+    </span>
+  </div>
+
+
+
+  <!-- OTHER ELEMENTS -->
+
+  <span id="dreamy-group">
+    <div id="dreamy" class=""><p>Prompt</p></div>
+    <div id="dreamy2" class=""><p>Prompt</p></div>
+  </span>
+
+  
+  <div id="card1">
+    
+  </div>
+
+  <footer>Ads helps make this website free for everyone. Please disable adblock 🥺</footer>
+</body>
+</html>
