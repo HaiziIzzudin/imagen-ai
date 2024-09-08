@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite --host",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "push": "git add dist -f && git commit -m \"adding dist\" && git subtree push --prefix dist origin gh-pages"
   },
   "devDependencies": {
     "@types/jquery": "^3.5.30",
