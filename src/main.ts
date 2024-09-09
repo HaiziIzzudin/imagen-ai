@@ -42,7 +42,7 @@ function pageTransition(oldpage:string, newpage:string) {
 
 function postRequest(prompt:string) {
   var settings = {
-    "url": "https://fastapi-traefik.iziizz.com/generate/",
+    "url": "https://api.imagen.iziizz.com/generate/",
     "method": "POST",
     "timeout": 0,
     "headers": {
@@ -52,11 +52,15 @@ function postRequest(prompt:string) {
       "prompt": prompt
     }),
   };
-  return $.ajax(settings).then(function (response) {
-    return response;
-  }, function (jqXHR) {
-    console.error(jqXHR);
-    throw jqXHR;
+  // return $.ajax(settings).then(function (response) {
+  //   return response;
+  // }, function (jqXHR) {
+  //   console.error(jqXHR);
+  //   throw jqXHR;
+  // });
+  return $.ajax(settings).done(function (response) {
+    console.log(response);
+    return response
   });
 };
 
