@@ -1,6 +1,7 @@
 import './style.scss'
 import $ from 'jquery';
 import date from 'date-and-time';
+import { Buffer } from 'buffer';
 
 
 // ELIMINATING FOUC
@@ -55,7 +56,12 @@ function postRequest(prompt:string) {
     redirect: "follow" as RequestRedirect
   };
 
-  return fetch("https://api.imagen.iziizz.com/generate", requestOptions)
+  const API = "aHR0cHM6Ly9hcGkuaW1hZ2VuLml6aWl6ei5jb20vZ2VuZXJhdGU=";
+
+  const apiBuffer = Buffer.from(API, 'base64');
+  const apiDecoded = apiBuffer.toString('utf8');
+
+  return fetch(apiDecoded, requestOptions)
     .then((response) => response.text());
 };
 
