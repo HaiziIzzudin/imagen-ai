@@ -167,7 +167,7 @@ function generateImage(prompt: string) {
     sleep(3).then(() => {  // Fake delay for dev mode
       // run dummy request
       const image = document.getElementById('img_output') as HTMLImageElement;
-      image.src = `https://i.pinimg.com/originals/2f/e0/2a/2fe02a4a7976470b00f82d7dd5fb6968.jpg`;
+      image.src = `https://c.tenor.com/k1wbOgEPazIAAAAM/the-rock-sus-meme-the-rock-sus.gif`;
       document.getElementById('dreamy-group')!.classList.remove('dreamy-group-show');
       pageTransition('screen2', 'screen3');
       console.log('Query dev mode complete ✅');
