@@ -41,27 +41,22 @@ function pageTransition(oldpage:string, newpage:string) {
 
 
 function postRequest(prompt:string) {
-  var settings = {
-    "url": "https://api.imagen.iziizz.com/generate/",
-    "method": "POST",
-    "timeout": 0,
-    "headers": {
-      "Content-Type": "application/json"
-    },
-    "data": JSON.stringify({
-      "prompt": prompt
-    }),
-  };
-  // return $.ajax(settings).then(function (response) {
-  //   return response;
-  // }, function (jqXHR) {
-  //   console.error(jqXHR);
-  //   throw jqXHR;
-  // });
-  return $.ajax(settings).done(function (response) {
-    console.log(response);
-    return response
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+
+  const raw = JSON.stringify({
+    "prompt": prompt
   });
+
+  const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+    redirect: "follow" as RequestRedirect
+  };
+
+  return fetch("https://api.imagen.iziizz.com/generate", requestOptions)
+    .then((response) => response.text());
 };
 
 
