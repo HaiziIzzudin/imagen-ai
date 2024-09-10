@@ -38,6 +38,14 @@ h1,h2,h3,p {
   text-align: center;
   // margin-top: 0;
 }
+code {
+  color: #eaeaff;
+  background-color: rgb(36, 36, 36);
+  border: gray 1px solid;
+  display: block;
+  padding: 10px;
+  border-radius: 10px;
+}
 h3 {
   margin-top: 60px;
 }
@@ -77,19 +85,27 @@ main {
     display: flex;
     align-items: start;
   }
+
+  .matter-checkbox {
+    margin-right: 69px;
+  }
+  .matter-radio {
+    margin-right: 20px;
+    span { padding-left: 27px; }
+  }
+  .div-checkboxes {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  
+    --matter-onsecondary-rgb: 0,0,0;
+  }
 }
 
 
-.div-checkboxes {
-  display: flex;
-  justify-content: end;
-  margin-top: 10px;
-
-  --matter-onsecondary-rgb: 0,0,0;
-}
 
 
-#screen2, #screen3 {
+#screen2, #screen-err, #screen3 {
   // FOR ANIMATION
   // By default is hidden
   display: none;
@@ -104,6 +120,7 @@ main {
     margin: 0 auto;
   }
 }
+
 #screen3 {
   .button-group {
     display: flex;
@@ -253,4 +270,18 @@ main {
     font-size: 400px;
     bottom: 0px;
   }
+  
+  main {
+    .matter-radio { 
+      display: block; 
+      margin-bottom: 10px;
+    }
+    .matter-checkbox {
+      margin-right: 0px;
+    }
+    .matter-radio {
+      span { padding-left: 30px; }
+    }
+  }
+
 }

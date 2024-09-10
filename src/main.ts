@@ -42,27 +42,35 @@ function pageTransition(oldpage:string, newpage:string) {
 
 
 function postRequest(prompt:string) {
-  const myHeaders = new Headers();
-  myHeaders.append("Content-Type", "application/json");
+  
+  var radioID = getSelectedRadioId()
+  console.log("Selected " + radioID)
+  let API: string;
 
-  const raw = JSON.stringify({
-    "prompt": prompt
-  });
+  function internalPOST(API:string) {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    const raw = JSON.stringify({ "prompt": prompt });
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow" as RequestRedirect
+    };
+    const apiBuffer = Buffer.from(API, 'base64');
+    const apiDecoded = apiBuffer.toString('utf8');
+    return fetch(apiDecoded, requestOptions)
+      .then((response) => response.text());
+  }
 
-  const requestOptions = {
-    method: "POST",
-    headers: myHeaders,
-    body: raw,
-    redirect: "follow" as RequestRedirect
-  };
-
-  const API = "aHR0cHM6Ly9hcGkuaW1hZ2VuLml6aWl6ei5jb20vZ2VuZXJhdGU=";
-
-  const apiBuffer = Buffer.from(API, 'base64');
-  const apiDecoded = apiBuffer.toString('utf8');
-
-  return fetch(apiDecoded, requestOptions)
-    .then((response) => response.text());
+  if (radioID === 'FLUXX') {
+    API = "aHR0cHM6Ly8xMzktMTYyLTU1LTU4LmlwLmxpbm9kZXVzZXJjb250ZW50LmNvbS9mbHV4LWdlbmVyYXRl";
+    return internalPOST(API);
+  } else if (radioID === 'IMGFX') {
+    API = "aHR0cHM6Ly8xMzktMTYyLTU1LTU4LmlwLmxpbm9kZXVzZXJjb250ZW50LmNvbS9pbWFnZWZ4LWdlbmVyYXRl"
+    return internalPOST(API);
+  }
+  
 };
 
 
@@ -90,34 +98,132 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-// on click of submit btn and regenerate btn
-document.getElementById('submit')!.addEventListener('click', () => {
-  // grab text input
-  const prompt = gatherPrompt();
-  // trnaition screen
-  pageTransition('screen1', 'screen2');
-  // dreamy show animation
-  document.getElementById('dreamy')!.querySelector('p')!.textContent = prompt;
-  document.getElementById('dreamy2')!.querySelector('p')!.textContent = prompt;
-  document.getElementById('dreamy-group')!.classList.add('dreamy-group-show');
-  generateImage(prompt);
+
+
+
+
+
+// init value
+let count_total: {"count": number, "total": number} = { count: 0, total: 0 };
+let response: Promise<{image_base64: string[]; total: number;}> | undefined;
+
+
+
+// on click of submit btn
+document.getElementById('submit')!.addEventListener('click', async () => {
+  
+  try {
+    // grab text input
+    const prompt = gatherPrompt();
+    // transition screen
+    pageTransition('screen1', 'screen2');
+    // dreamy show animation
+    document.getElementById('dreamy')!.querySelector('p')!.textContent = prompt;
+    document.getElementById('dreamy2')!.querySelector('p')!.textContent = prompt;
+    document.getElementById('dreamy-group')!.classList.add('dreamy-group-show');
+    
+    // generated image return json object (this also make calls to the API, therefore generating new one)
+    response = generateImage(prompt)
+    // have to wait if response contains content, then proceed to load and show image
+    if (response) {
+      // store image count
+      count_total.count = 0;
+      count_total.total = (await response)?.total;
+  
+      // grab image element and change src
+      const image = document.getElementById('img_output') as HTMLImageElement;
+      image.src = `data:image/jpeg;base64,${(await response)?.image_base64[count_total.count]}`;
+      // grab total images and replace content of regenerate btn
+      document.getElementById('regenerate')!.querySelector('span')!.textContent = `Regenerate (${count_total.count+1}/${count_total.total})`;
+      // remove dreamy group and transition to screen 3
+      document.getElementById('dreamy-group')!.classList.remove('dreamy-group-show');
+      pageTransition('screen2', 'screen3');
+      console.log(`Showing photo ${count_total.count+1}/${count_total.total} ✅`);
+    }
+  
+  } catch (error) {
+    document.getElementById('screen-err')!.querySelector('code')!.textContent += error!.toString();
+    document.getElementById('dreamy-group')!.classList.remove('dreamy-group-show');
+    pageTransition('screen2', 'screen-err');
+  }
+  
 });
-// regenerate btn
-document.getElementById('regenerate')!.addEventListener('click', () => {
+
+
+////////////////////////////////
+// on click of regenerate btn //
+////////////////////////////////
+document.getElementById('regenerate')!.addEventListener('click', async () => {
+  
   // undo animation gradient
-  sleep(0.2).then(() => {
-    document.getElementById('gradient-overlay')!.classList.remove('gradient-overlay-show');
-  })
+  sleep(0.2).then(() => { document.getElementById('gradient-overlay')!.classList.remove('gradient-overlay-show'); })
   // grab text input
   const prompt = gatherPrompt();
-  // trnaition screen
+  // transition screen from screen 3 to screen 2
   pageTransition('screen3', 'screen2');
   // dreamy show animation
   document.getElementById('dreamy')!.querySelector('p')!.textContent = prompt;
   document.getElementById('dreamy2')!.querySelector('p')!.textContent = prompt;
   document.getElementById('dreamy-group')!.classList.add('dreamy-group-show');
-  generateImage(prompt);
+  
+  
+  // condition for count_total
+  count_total.count++;
+  if (count_total.count < count_total.total) {
+    sleep(1).then(async () => {
+      // grab image element and change src
+      const image = document.getElementById('img_output') as HTMLImageElement;
+      image.src = `data:image/jpeg;base64,${(await response)?.image_base64[count_total.count]}`;
+      // grab total images and replace content of regenerate btn
+      document.getElementById('regenerate')!.querySelector('span')!.textContent = `Regenerate (${count_total.count+1}/${count_total.total})`;
+      // remove dreamy group and transition to screen 3
+      document.getElementById('dreamy-group')!.classList.remove('dreamy-group-show');
+      pageTransition('screen2', 'screen3');
+      console.log(`Showing photo ${count_total.count+1}/${count_total.total} ✅`);
+    })
+  } else {
+    try {
+      // grab text input
+      const prompt = gatherPrompt();
+      // transition screen
+      pageTransition('screen3', 'screen2');
+      // dreamy show animation
+      document.getElementById('dreamy')!.querySelector('p')!.textContent = prompt;
+      document.getElementById('dreamy2')!.querySelector('p')!.textContent = prompt;
+      document.getElementById('dreamy-group')!.classList.add('dreamy-group-show');
+      
+      // generated image return json object (this also make calls to the API, therefore generating new one)
+      response = generateImage(prompt)
+      // have to wait if response contains content, then proceed to load and show image
+      if (response) {
+        // store image count
+        count_total.count = 0;
+        count_total.total = (await response)?.total;
+    
+        // grab image element and change src
+        const image = document.getElementById('img_output') as HTMLImageElement;
+        image.src = `data:image/jpeg;base64,${(await response)?.image_base64[count_total.count]}`;
+        // grab total images and replace content of regenerate btn
+        document.getElementById('regenerate')!.querySelector('span')!.textContent = `Regenerate (${count_total.count+1}/${count_total.total})`;
+        // remove dreamy group and transition to screen 3
+        document.getElementById('dreamy-group')!.classList.remove('dreamy-group-show');
+        pageTransition('screen2', 'screen3');
+        console.log(`Showing photo ${count_total.count+1}/${count_total.total} ✅`);
+      }
+    
+    } catch (error) {
+      document.getElementById('screen-err')!.querySelector('code')!.textContent += error!.toString();
+      document.getElementById('dreamy-group')!.classList.remove('dreamy-group-show');
+      pageTransition('screen2', 'screen-err');
+    }
+  }
 });
+
+
+
+
+
+
 
 
 
@@ -158,25 +264,49 @@ function generateImage(prompt: string) {
     console.log('Submitting query...');
     
     // make post request
-    postRequest(prompt).then((result) => {
+    return postRequest(prompt)?.then((result) => {
       console.log(result);
-      // the result will come out as base64.
-      // Make how to convert it to image temporarily to be displayed in HTML.
-      const image = document.getElementById('img_output') as HTMLImageElement;
-      image.src = `data:image/jpeg;base64,${result}`;
-      document.getElementById('dreamy-group')!.classList.remove('dreamy-group-show');
-      pageTransition('screen2', 'screen3');
-      console.log('Query complete ✅');
+      // the result will come out as json string.
+      // Make how to convert it to json object to be displayed in HTML.
+      const jsonObject = JSON.parse(result) as { 
+        image_base64: string[], 
+        total: number 
+      };
+      return jsonObject;
     });
+
   } else if (isDevMode == true) {
     console.warn('!!! DEV MODE !!! Submitting query...');
+    var radioID = getSelectedRadioId()
+    console.warn("!!! DEV MODE !!! Selected " + radioID)
     sleep(3).then(() => {  // Fake delay for dev mode
       // run dummy request
       const image = document.getElementById('img_output') as HTMLImageElement;
       image.src = `https://c.tenor.com/k1wbOgEPazIAAAAM/the-rock-sus-meme-the-rock-sus.gif`;
       document.getElementById('dreamy-group')!.classList.remove('dreamy-group-show');
       pageTransition('screen2', 'screen3');
+      // grab total images and replace content of regenerate btn
+      document.getElementById('regenerate')!.querySelector('span')!.textContent = `Regenerate (69/420)`;
       console.log('Query dev mode complete ✅');
     });
   }
 }
+
+
+
+
+
+
+function getSelectedRadioId(): string | undefined {
+  const selectedRadio = document.querySelector<HTMLInputElement>('input[name="group"]:checked');
+  if (selectedRadio) {
+    return selectedRadio.id;
+  }
+}
+
+
+      // const image = document.getElementById('img_output') as HTMLImageElement;
+      // image.src = `data:image/jpeg;base64,${result}`;
+      // document.getElementById('dreamy-group')!.classList.remove('dreamy-group-show');
+      // pageTransition('screen2', 'screen3');
+      // console.log('Query complete ✅');

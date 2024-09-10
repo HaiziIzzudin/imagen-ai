@@ -7,8 +7,8 @@
   <link href="https://res.cloudinary.com/finnhvman/raw/upload/matter/matter-0.2.2.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <script data-grow-initializer="">!(function(){window.growMe||((window.growMe=function(e){window.growMe._.push(e);}),(window.growMe._=[]));var e=document.createElement("script");(e.type="text/javascript"),(e.src="https://faves.grow.me/main.js"),(e.defer=!0),e.setAttribute("data-grow-faves-site-id","U2l0ZTo2NzUyZDE5ZC1jM2I3LTRkNmEtYTRhZS05MjVlNzk2Njg4MjI=");var t=document.getElementsByTagName("script")[0];t.parentNode.insertBefore(e,t);})();</script>
-  <script type="module" crossorigin src="/assets/index-DeOJObBY.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-D-zqVFVI.css">
+  <script type="module" crossorigin src="/assets/index-HNjZVOES.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-eRwduy-C.css">
 </head>
 <body style="visibility: hidden;">
   
@@ -18,6 +18,7 @@
 
   <main id="screen1" class="">
     <h1>✨ Imagen ✨<br>AI Image Generator</h1>
+    
     <div class="userinput">
       <label class="matter-textfield-outlined">
         <!-- <input placeholder=" "/> -->
@@ -28,11 +29,25 @@
         <i class="fa-solid fa-circle-chevron-right"></i>
       </button>
     </div>
+    
     <div class="div-checkboxes">
+      
+      <span class="span-radio">
+        <label class="matter-radio">
+          <input type="radio" name="group" id="FLUXX" checked>
+          <span>FLUX</span>
+        </label>
+        <label class="matter-radio">
+          <input type="radio" name="group" id="IMGFX">
+          <span>ImageFX</span>
+        </label>
+      </span>
+    
       <label class="matter-checkbox matter-secondary">
         <input type="checkbox" id="devmode" checked>
-        <span style="font-family: monospace;">Developer Mode</span>
+        <span style="font-family: monospace;">Test</span>
       </label>
+
     </div>
   </main>
 
@@ -41,6 +56,14 @@
     <h2>Generating...</h2>
     <progress class="matter-progress-linear"></progress>
     <p>Give us 60 seconds or so... ⏳</p>
+  </div>
+
+
+  <div id="screen-err">
+    <h2>Error :(</h2>
+    <p>An error has occured.</p>
+    <p>Please try again later.</p>
+    <code>DEV: Check console log for error.<br></code>
   </div>
 
 
@@ -56,7 +79,7 @@
         <i class="fa-solid fa-download"></i>Download
       </button>
       <button type="button" id="regenerate" class="matter-button-unelevated">
-        <i class="fa-solid fa-rotate-left"></i>Regenerate
+        <i class="fa-solid fa-rotate-left"></i><span>Regenerate</span>
       </button>
       <button type="button" id="adjust-prompt" class="matter-button-unelevated">
         <i class="fa-solid fa-pen-to-square"></i>Adjust Prompt
