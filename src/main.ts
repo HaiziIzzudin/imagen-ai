@@ -69,6 +69,9 @@ function postRequest(prompt:string) {
   } else if (radioID === 'IMGFX') {
     API = "aHR0cHM6Ly8xMzktMTYyLTU1LTU4LmlwLmxpbm9kZXVzZXJjb250ZW50LmNvbS9pbWFnZWZ4LWdlbmVyYXRl"
     return internalPOST(API);
+  } else if (radioID === 'ERROR') {
+    API = ""
+    return internalPOST(API);
   }
   
 };
@@ -260,35 +263,39 @@ function generateImage(prompt: string) {
   // check for chcekbox ticked or not
   const devModeCheckbox = document.getElementById('devmode') as HTMLInputElement;
   const isDevMode = devModeCheckbox.checked;
-  if (isDevMode == false) {
-    console.log('Submitting query...');
-    
-    // make post request
-    return postRequest(prompt)?.then((result) => {
-      console.log(result);
-      // the result will come out as json string.
-      // Make how to convert it to json object to be displayed in HTML.
-      const jsonObject = JSON.parse(result) as { 
-        image_base64: string[], 
-        total: number 
-      };
-      return jsonObject;
-    });
-
-  } else if (isDevMode == true) {
-    console.warn('!!! DEV MODE !!! Submitting query...');
-    var radioID = getSelectedRadioId()
-    console.warn("!!! DEV MODE !!! Selected " + radioID)
-    sleep(3).then(() => {  // Fake delay for dev mode
-      // run dummy request
-      const image = document.getElementById('img_output') as HTMLImageElement;
-      image.src = `https://c.tenor.com/k1wbOgEPazIAAAAM/the-rock-sus-meme-the-rock-sus.gif`;
-      document.getElementById('dreamy-group')!.classList.remove('dreamy-group-show');
-      pageTransition('screen2', 'screen3');
-      // grab total images and replace content of regenerate btn
-      document.getElementById('regenerate')!.querySelector('span')!.textContent = `Regenerate (69/420)`;
-      console.log('Query dev mode complete ✅');
-    });
+  try {
+    if (isDevMode == false) {
+      console.log('Submitting query...');
+      
+      // make post request
+      return postRequest(prompt)?.then((result) => {
+        console.log(result);
+        // the result will come out as json string.
+        // Make how to convert it to json object to be displayed in HTML.
+        const jsonObject = JSON.parse(result) as { 
+          image_base64: string[], 
+          total: number 
+        };
+        return jsonObject;
+      });
+  
+    } else if (isDevMode == true) {
+      console.warn('!!! DEV MODE !!! Submitting query...');
+      var radioID = getSelectedRadioId()
+      console.warn("!!! DEV MODE !!! Selected " + radioID)
+      sleep(3).then(() => {  // Fake delay for dev mode
+        // run dummy request
+        const image = document.getElementById('img_output') as HTMLImageElement;
+        image.src = `https://c.tenor.com/k1wbOgEPazIAAAAM/the-rock-sus-meme-the-rock-sus.gif`;
+        document.getElementById('dreamy-group')!.classList.remove('dreamy-group-show');
+        pageTransition('screen2', 'screen3');
+        // grab total images and replace content of regenerate btn
+        document.getElementById('regenerate')!.querySelector('span')!.textContent = `Regenerate (69/420)`;
+        console.log('Query dev mode complete ✅');
+      });
+    }
+  } catch (error) {
+    throw error;
   }
 }
 
