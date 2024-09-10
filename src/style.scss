@@ -276,12 +276,11 @@ main {
       display: block; 
       margin-bottom: 10px;
     }
-    .matter-checkbox {
-      margin-right: 0px;
-    }
+    .matter-checkbox { margin-right: 0px; }
     .matter-radio {
       span { padding-left: 30px; }
     }
+    .div-checkboxes { justify-content: space-evenly; }
   }
 
 }
