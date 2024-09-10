@@ -64,10 +64,10 @@ function postRequest(prompt:string) {
   }
 
   if (radioID === 'FLUXX') {
-    API = "aHR0cHM6Ly8xMzktMTYyLTU1LTU4LmlwLmxpbm9kZXVzZXJjb250ZW50LmNvbS9mbHV4LWdlbmVyYXRl";
+    API = "aHR0cHM6Ly9hcGktaW1hZ2VuLmFpLml6aWl6ei5jb20vZmx1eC1nZW5lcmF0ZQ==";
     return internalPOST(API);
   } else if (radioID === 'IMGFX') {
-    API = "aHR0cHM6Ly8xMzktMTYyLTU1LTU4LmlwLmxpbm9kZXVzZXJjb250ZW50LmNvbS9pbWFnZWZ4LWdlbmVyYXRl"
+    API = ""
     return internalPOST(API);
   } else if (radioID === 'ERROR') {
     API = ""
