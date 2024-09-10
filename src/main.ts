@@ -67,7 +67,7 @@ function postRequest(prompt:string) {
     API = "aHR0cHM6Ly9hcGktaW1hZ2VuLmFpLml6aWl6ei5jb20vZmx1eC1nZW5lcmF0ZQ==";
     return internalPOST(API);
   } else if (radioID === 'IMGFX') {
-    API = ""
+    API = "aHR0cHM6Ly9hcGktaW1hZ2VuLmFpLml6aWl6ei5jb20vaW1hZ2VmeC1nZW5lcmF0ZQ=="
     return internalPOST(API);
   } else if (radioID === 'ERROR') {
     API = ""
