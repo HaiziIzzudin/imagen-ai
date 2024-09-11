@@ -55,7 +55,8 @@ function postRequest(prompt:string) {
       method: "POST",
       headers: myHeaders,
       body: raw,
-      redirect: "follow" as RequestRedirect
+      redirect: "follow" as RequestRedirect,
+      timeout: 150000 // 2.5 minutes
     };
     const apiBuffer = Buffer.from(API, 'base64');
     const apiDecoded = apiBuffer.toString('utf8');
