@@ -2,7 +2,6 @@ import './style.scss'
 import $ from 'jquery';
 import date from 'date-and-time';
 import { Buffer } from 'buffer';
-import { JsonObjectExpression } from 'typescript';
 
 
 // ELIMINATING FOUC
