@@ -133,42 +133,53 @@ let response: Promise<{image_base64: string[]; total: number;}> | undefined;
 
 // on click of submit btn
 document.getElementById('submit')!.addEventListener('click', async () => {
-  
-  try {
-    // grab text input
-    const prompt = gatherPrompt();
-    // transition screen
-    pageTransition('screen1', 'screen2');
-    // dreamy show animation
-    document.getElementById('dreamy')!.querySelector('p')!.textContent = prompt;
-    document.getElementById('dreamy2')!.querySelector('p')!.textContent = prompt;
-    document.getElementById('dreamy-group')!.classList.add('dreamy-group-show');
+  // transition screen
+  pageTransition('screen1', 'screen2');
+  while (true) {
+    try {
+      // grab text input
+      const prompt = gatherPrompt();
+      // dreamy show animation
+      document.getElementById('dreamy')!.querySelector('p')!.textContent = prompt;
+      document.getElementById('dreamy2')!.querySelector('p')!.textContent = prompt;
+      document.getElementById('dreamy-group')!.classList.add('dreamy-group-show');
+      
+      // generated image return json object (this also make calls to the API, therefore generating new one)
+      response = generateImage(prompt)
+      // have to wait if response contains content, then proceed to load and show image
+      if (response) {
+        // store image count
+        count_total.count = 0;
+        count_total.total = (await response)?.total;
     
-    // generated image return json object (this also make calls to the API, therefore generating new one)
-    response = generateImage(prompt)
-    // have to wait if response contains content, then proceed to load and show image
-    if (response) {
-      // store image count
-      count_total.count = 0;
-      count_total.total = (await response)?.total;
-  
-      // grab image element and change src
-      const image = document.getElementById('img_output') as HTMLImageElement;
-      image.src = `data:image/jpeg;base64,${(await response)?.image_base64[count_total.count]}`;
-      // grab total images and replace content of regenerate btn
-      document.getElementById('regenerate')!.querySelector('span')!.textContent = `Regenerate (${count_total.count+1}/${count_total.total})`;
-      // remove dreamy group and transition to screen 3
-      document.getElementById('dreamy-group')!.classList.remove('dreamy-group-show');
-      pageTransition('screen2', 'screen3');
-      console.log(`Showing photo ${count_total.count+1}/${count_total.total} ✅`);
+        // grab image element and change src
+        const image = document.getElementById('img_output') as HTMLImageElement;
+        image.src = `data:image/jpeg;base64,${(await response)?.image_base64[count_total.count]}`;
+        // grab total images and replace content of regenerate btn
+        document.getElementById('regenerate')!.querySelector('span')!.textContent = `Regenerate (${count_total.count+1}/${count_total.total})`;
+        // remove dreamy group and transition to screen 3
+        document.getElementById('dreamy-group')!.classList.remove('dreamy-group-show');
+        pageTransition('screen2', 'screen3');
+        console.log(`Showing photo ${count_total.count+1}/${count_total.total} ✅`);
+        break; // exit while loop (success)
+      }
+    } catch (error) {
+      var radioID = getSelectedRadioId()
+      if (radioID === 'IMGFX') {
+        document.getElementById('dreamy-group')!.classList.remove('dreamy-group-show');
+        pageTransition('screen2', 'screen-err');
+        console.error(error);
+        break;
+      } else {
+        pageTransition('screen2', 'screen2');
+        console.error(error);
+        document.getElementById('subtitle')!.textContent = `We're having some issues generating your image 😞.<br>
+        Please hold as we making new request for you.`;
+        // loop again
+      }
+      
     }
-  
-  } catch (error) {
-    document.getElementById('screen-err')!.querySelector('code')!.textContent += error!.toString();
-    document.getElementById('dreamy-group')!.classList.remove('dreamy-group-show');
-    pageTransition('screen2', 'screen-err');
   }
-  
 });
 
 
@@ -181,6 +192,8 @@ document.getElementById('regenerate')!.addEventListener('click', async () => {
   sleep(0.2).then(() => { document.getElementById('gradient-overlay')!.classList.remove('gradient-overlay-show'); })
   // grab text input
   const prompt = gatherPrompt();
+  // set subtitle to default
+  document.getElementById('subtitle')!.textContent = `Give us 60 seconds or so... ⏳`;
   // transition screen from screen 3 to screen 2
   pageTransition('screen3', 'screen2');
   // dreamy show animation
@@ -232,11 +245,12 @@ document.getElementById('regenerate')!.addEventListener('click', async () => {
         pageTransition('screen2', 'screen3');
         console.log(`Showing photo ${count_total.count+1}/${count_total.total} ✅`);
       }
-    
     } catch (error) {
-      document.getElementById('screen-err')!.querySelector('code')!.textContent += error!.toString();
-      document.getElementById('dreamy-group')!.classList.remove('dreamy-group-show');
-      pageTransition('screen2', 'screen-err');
+      pageTransition('screen2', 'screen2');
+      console.error(error);
+      document.getElementById('subtitle')!.textContent = `We're having some issues generating your image 😞.<br>
+      Please hold as we making new request for you.`;
+      // loop again
     }
   }
 });
