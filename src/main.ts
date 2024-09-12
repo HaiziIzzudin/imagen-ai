@@ -2,6 +2,7 @@ import './style.scss'
 import $ from 'jquery';
 import date from 'date-and-time';
 import { Buffer } from 'buffer';
+import { JsonObjectExpression } from 'typescript';
 
 
 // ELIMINATING FOUC
@@ -41,6 +42,24 @@ function pageTransition(oldpage:string, newpage:string) {
 
 
 
+async function fetchWithTimeout(resource:string, options: {timeout?: number} = {}) {
+  const { timeout: timeoutSeconds } = options;
+  const timeout = timeoutSeconds ? timeoutSeconds * 1000 : undefined;
+  
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+
+  const response = await fetch(resource, {
+    ...options,
+    signal: controller.signal  
+  });
+  clearTimeout(id);
+
+  return response;
+}
+
+
+
 function postRequest(prompt:string) {
   
   var radioID = getSelectedRadioId()
@@ -56,11 +75,11 @@ function postRequest(prompt:string) {
       headers: myHeaders,
       body: raw,
       redirect: "follow" as RequestRedirect,
-      timeout: 300000 // 5 minutes
     };
     const apiBuffer = Buffer.from(API, 'base64');
     const apiDecoded = apiBuffer.toString('utf8');
-    return fetch(apiDecoded, requestOptions)
+    
+    return fetchWithTimeout(apiDecoded, { timeout: 120, ...requestOptions }) // timeout in second(s)
       .then((response) => response.text());
   }
 
