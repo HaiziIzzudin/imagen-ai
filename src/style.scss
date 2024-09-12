@@ -86,19 +86,12 @@ main {
     align-items: start;
   }
 
-  .matter-checkbox {
-    margin-right: 69px;
+  .div-radio {
+    text-align: center;
+    margin-top: 20px;
   }
   .matter-radio {
-    margin-right: 20px;
-    span { padding-left: 27px; }
-  }
-  .div-checkboxes {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-  
-    --matter-onsecondary-rgb: 0,0,0;
+    margin: 0 10px 15px;
   }
 }
 
@@ -270,17 +263,4 @@ main {
     font-size: 400px;
     bottom: 0px;
   }
-  
-  main {
-    .matter-radio { 
-      display: block; 
-      margin-bottom: 10px;
-    }
-    .matter-checkbox { margin-right: 0px; }
-    .matter-radio {
-      span { padding-left: 30px; }
-    }
-    .div-checkboxes { justify-content: space-evenly; }
-  }
-
 }
