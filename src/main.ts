@@ -78,7 +78,7 @@ function postRequest(prompt:string) {
     const apiBuffer = Buffer.from(API, 'base64');
     const apiDecoded = apiBuffer.toString('utf8');
     
-    return fetchWithTimeout(apiDecoded, { timeout: 120, ...requestOptions }) // timeout in second(s)
+    return fetchWithTimeout(apiDecoded, { timeout: 180, ...requestOptions }) // timeout in second(s)
       .then((response) => response.text());
   }
 
