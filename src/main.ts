@@ -59,7 +59,7 @@ async function fetchWithTimeout(resource:string, options: {timeout?: number} = {
 
 
 
-function postRequest(prompt:string): Promise<string> {
+function postRequest(prompt:string) {
   
   var radioID = getSelectedRadioId()
   console.log("Selected " + radioID)
@@ -88,14 +88,7 @@ function postRequest(prompt:string): Promise<string> {
   } else if (radioID === 'IMGFX') {
     API = "aHR0cHM6Ly9hcGktaW1hZ2VuLmFpLml6aWl6ei5jb20vaW1hZ2VmeC1nZW5lcmF0ZQ=="
     return Promise.resolve(internalPOST(API));
-  } else if (radioID === 'ERROR') {
-    API = ""
-    return Promise.resolve(internalPOST(API));
-  } else if (radioID === 'TTEST') {
-    const src = "https://i.imgflip.com/7kaubz.gif"
-    return Promise.resolve(src);
   }
-  
 };
 
 
@@ -139,65 +132,51 @@ document.getElementById('submit')!.addEventListener('click', async () => {
   // transition screen
   pageTransition('screen1', 'screen2');
 
-  // check if devmode is selected
-  var radioID = getSelectedRadioId()
-  if (radioID === 'TTEST') {
-    // devmode is selected
-    sleep(2).then(async () => {
-      const response = await postRequest("test"); // this response returns src string 
-      // grab image element and change src
-      const image = document.getElementById('img_output') as HTMLImageElement;
-      image.src = response;
-      pageTransition('screen2', 'screen3');
-    })
-  } else {
-    // devmode is not selected
-    while (true) {
-      try {
-        // grab text input
-        const prompt = gatherPrompt();
-        // dreamy show animation
-        document.getElementById('dreamy')!.querySelector('p')!.textContent = prompt;
-        document.getElementById('dreamy2')!.querySelector('p')!.textContent = prompt;
-        document.getElementById('dreamy-group')!.classList.add('dreamy-group-show');
-        
-        // generated image return json object (this also make calls to the API, therefore generating new one)
-        response = generateImage(prompt)
-        // have to wait if response contains content, then proceed to load and show image
-        if (response) {
-          // store image count
-          count_total.count = 0;
-          count_total.total = (await response)?.total;
+  // devmode is not selected
+  while (true) {
+    try {
+      // grab text input
+      const prompt = gatherPrompt();
+      // dreamy show animation
+      document.getElementById('dreamy')!.querySelector('p')!.textContent = prompt;
+      document.getElementById('dreamy2')!.querySelector('p')!.textContent = prompt;
+      document.getElementById('dreamy-group')!.classList.add('dreamy-group-show');
       
-          // grab image element and change src
-          const image = document.getElementById('img_output') as HTMLImageElement;
-          image.src = `data:image/jpeg;base64,${(await response)?.image_base64[count_total.count]}`;
-          // grab total images and replace content of regenerate btn
-          document.getElementById('regenerate')!.querySelector('span')!.textContent = `Regenerate (${count_total.count+1}/${count_total.total})`;
-          // remove dreamy group and transition to screen 3
-          document.getElementById('dreamy-group')!.classList.remove('dreamy-group-show');
-          pageTransition('screen2', 'screen3');
-          console.log(`Showing photo ${count_total.count+1}/${count_total.total} ✅`);
-          break; // exit while loop (success)
-        }
-      } catch (error) {
-        var radioID = getSelectedRadioId()
-        if (radioID === 'IMGFX') {
-          document.getElementById('dreamy-group')!.classList.remove('dreamy-group-show');
-          pageTransition('screen2', 'screen-err');
-          console.error(error);
-          break;
-        } else {
-          pageTransition('screen2', 'screen2');
-          console.error(error);
-          document.getElementById('subtitle')!.textContent = `We're having some issues generating your image 😞.<br>
-          Please hold as we making new request for you.`;
-          // loop again
-        }
+      // generated image return json object (this also make calls to the API, therefore generating new one)
+      response = generateImage(prompt)
+      // have to wait if response contains content, then proceed to load and show image
+      if (response) {
+        // store image count
+        count_total.count = 0;
+        count_total.total = (await response)?.total;
+    
+        // grab image element and change src
+        const image = document.getElementById('img_output') as HTMLImageElement;
+        image.src = `data:image/jpeg;base64,${(await response)?.image_base64[count_total.count]}`;
+        // grab total images and replace content of regenerate btn
+        document.getElementById('regenerate')!.querySelector('span')!.textContent = `Regenerate (${count_total.count+1}/${count_total.total})`;
+        // remove dreamy group and transition to screen 3
+        document.getElementById('dreamy-group')!.classList.remove('dreamy-group-show');
+        pageTransition('screen2', 'screen3');
+        console.log(`Showing photo ${count_total.count+1}/${count_total.total} ✅`);
+        break; // exit while loop (success)
+      }
+    } catch (error) {
+      var radioID = getSelectedRadioId()
+      if (radioID === 'IMGFX') {
+        document.getElementById('dreamy-group')!.classList.remove('dreamy-group-show');
+        pageTransition('screen2', 'screen-err');
+        console.error(error);
+        break;
+      } else {
+        pageTransition('screen2', 'screen2');
+        console.error(error);
+        document.getElementById('subtitle')!.textContent = `We're having some issues generating your image 😞.<br>
+        Please hold as we making new request for you.`;
+        // loop again
       }
     }
   }
-
 });
 
 
