@@ -61,7 +61,7 @@ async function fetchWithTimeout(resource:string, options: {timeout?: number} = {
 
 function postRequest(prompt:string) {
   
-  var radioID = getSelectedRadioId()
+  var radioID = 'FLUXX'
   console.log("Selected " + radioID)
   let API: string;
 
