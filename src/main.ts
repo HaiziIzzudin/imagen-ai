@@ -1,7 +1,6 @@
 import './style.scss'
 import $ from 'jquery';
 import date from 'date-and-time';
-import { Buffer } from 'buffer';
 
 
 // ELIMINATING FOUC
@@ -24,7 +23,7 @@ function sleep(seconds: number) {
  * @param oldpage the id of the page that is currently being shown
  * @param newpage the id of the page that should be shown
  */
-function pageTransition(oldpage:string, newpage:string) {
+function pageTransition(oldpage:string, newpage:string, prompt: string = '') {
   document.getElementById(oldpage)!.classList.add('anim-exit');
   sleep(0.2).then(() => {
     document.getElementById(oldpage)!.classList.remove('anim-block-show', 'anim-show', 'anim-exit');
@@ -36,60 +35,18 @@ function pageTransition(oldpage:string, newpage:string) {
       }
     });
   });
+
+  // globally set dreamy text to prompt
+  document.getElementById('dreamy')!.querySelector('p')!.textContent = prompt;
+  document.getElementById('dreamy2')!.querySelector('p')!.textContent = prompt;
+
+  if (oldpage === 'screen1' && newpage === 'screen2') {
+    document.getElementById('dreamy-group')!.classList.add('dreamy-group-show');
+  } else if (oldpage === 'screen2' && newpage === 'screen3') {
+    document.getElementById('dreamy-group')!.classList.remove('dreamy-group-show');
+  }
 }
 
-
-
-
-async function fetchWithTimeout(resource:string, options: {timeout?: number} = {}) {
-  const { timeout: timeoutSeconds } = options;
-  const timeout = timeoutSeconds ? timeoutSeconds * 1000 : undefined;
-  
-  const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), timeout);
-
-  const response = await fetch(resource, {
-    ...options,
-    signal: controller.signal  
-  });
-  clearTimeout(id);
-
-  return response;
-}
-
-
-
-function postRequest(prompt:string) {
-  
-  var radioID = 'FLUXX'
-  console.log("Selected " + radioID)
-  let API: string;
-
-  function internalPOST(API:string) {
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    const raw = JSON.stringify({ "prompt": prompt });
-    const requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow" as RequestRedirect,
-    };
-    const apiBuffer = Buffer.from(API, 'base64');
-    const apiDecoded = apiBuffer.toString('utf8');
-    
-    return fetchWithTimeout(apiDecoded, { timeout: 300, ...requestOptions }) // timeout in second(s)
-      .then((response) => response.text());
-  }
-
-  if (radioID === 'FLUXX') {
-    API = "aHR0cHM6Ly9hcGktaW1hZ2VuLmFpLml6aWl6ei5jb20vZmx1eC1nZW5lcmF0ZQ==";
-    return Promise.resolve(internalPOST(API));
-  } else if (radioID === 'IMGFX') {
-    API = "aHR0cHM6Ly9hcGktaW1hZ2VuLmFpLml6aWl6ei5jb20vaW1hZ2VmeC1nZW5lcmF0ZQ=="
-    return Promise.resolve(internalPOST(API));
-  }
-};
 
 
 // when input is filled, remove button disabled attribute
@@ -104,9 +61,6 @@ document.querySelector('textarea')!.addEventListener('input', (e) => {
 
 
 
-
-
-
 // on content load
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('screen1')!.classList.add('anim-block-show');
@@ -117,146 +71,53 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-
-
-
-
-// init value
-let count_total: {"count": number, "total": number} = { count: 0, total: 0 };
-let response: Promise<{image_base64: string[]; total: number;}> | undefined;
-
-
-
 // on click of submit btn
 document.getElementById('submit')!.addEventListener('click', async () => {
+  
+  // grab text input and radioID
+  const prompt = (document.querySelector('textarea') as HTMLTextAreaElement).value;
+  const radioID = (document.querySelector<HTMLInputElement>('input[name="group"]:checked'))?.id;
+  let settings; let url;
+
+  // radio selection logic
+  if (radioID === 'FLUXX') {
+    console.log('Selected FLUXX');
+    url = "https://api-imagen.ai.iziizz.com/flux-generate";
+  } else if (radioID === 'REALX') {
+    console.log('Selected REALX');
+    url = "https://api-imagen.ai.iziizz.com/flux-realism-generate";
+  }
+
+  // make a POST request to the server
+  settings = {
+    "url": url,
+    "method": "POST",
+    "timeout": 0,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "data": JSON.stringify({
+      "prompt": prompt
+    }),
+  };
+
   // transition screen
-  pageTransition('screen1', 'screen2');
-
-  // devmode is not selected
-  while (true) {
-    try {
-      // grab text input
-      const prompt = gatherPrompt();
-      // dreamy show animation
-      document.getElementById('dreamy')!.querySelector('p')!.textContent = prompt;
-      document.getElementById('dreamy2')!.querySelector('p')!.textContent = prompt;
-      document.getElementById('dreamy-group')!.classList.add('dreamy-group-show');
-      
-      // generated image return json object (this also make calls to the API, therefore generating new one)
-      response = generateImage(prompt)
-      // have to wait if response contains content, then proceed to load and show image
-      if (response) {
-        // store image count
-        count_total.count = 0;
-        count_total.total = (await response)?.total;
+  pageTransition('screen1', 'screen2', prompt);
+  
+  $.ajax(settings).done(function (response) {
     
-        // grab image element and change src
-        const image = document.getElementById('img_output') as HTMLImageElement;
-        image.src = `data:image/jpeg;base64,${(await response)?.image_base64[count_total.count]}`;
-        // grab total images and replace content of regenerate btn
-        document.getElementById('regenerate')!.querySelector('span')!.textContent = `Regenerate (${count_total.count+1}/${count_total.total})`;
-        // remove dreamy group and transition to screen 3
-        document.getElementById('dreamy-group')!.classList.remove('dreamy-group-show');
-        pageTransition('screen2', 'screen3');
-        console.log(`Showing photo ${count_total.count+1}/${count_total.total} ✅`);
-        break; // exit while loop (success)
-      }
-    } catch (error) {
-      var radioID = getSelectedRadioId()
-      if (radioID === 'IMGFX') {
-        document.getElementById('dreamy-group')!.classList.remove('dreamy-group-show');
-        pageTransition('screen2', 'screen-err');
-        console.error(error);
-        break;
-      } else {
-        pageTransition('screen2', 'screen2');
-        console.error(error);
-        document.getElementById('subtitle')!.textContent = `We're having some issues generating your image 😞.<br>
-        Please hold as we making new request for you.`;
-        // loop again
-      }
-    }
-  }
-});
-
-
-////////////////////////////////
-// on click of regenerate btn //
-////////////////////////////////
-document.getElementById('regenerate')!.addEventListener('click', async () => {
-  
-  // undo animation gradient
-  sleep(0.2).then(() => { document.getElementById('gradient-overlay')!.classList.remove('gradient-overlay-show'); })
-  // grab text input
-  const prompt = gatherPrompt();
-  // set subtitle to default
-  document.getElementById('subtitle')!.textContent = `Give us 60 seconds or so... ⏳`;
-  // transition screen from screen 3 to screen 2
-  pageTransition('screen3', 'screen2');
-  // dreamy show animation
-  document.getElementById('dreamy')!.querySelector('p')!.textContent = prompt;
-  document.getElementById('dreamy2')!.querySelector('p')!.textContent = prompt;
-  document.getElementById('dreamy-group')!.classList.add('dreamy-group-show');
-  
-  
-  // condition for count_total
-  count_total.count++;
-  if (count_total.count < count_total.total) {
-    sleep(1).then(async () => {
-      // grab image element and change src
-      const image = document.getElementById('img_output') as HTMLImageElement;
-      image.src = `data:image/jpeg;base64,${(await response)?.image_base64[count_total.count]}`;
-      // grab total images and replace content of regenerate btn
-      document.getElementById('regenerate')!.querySelector('span')!.textContent = `Regenerate (${count_total.count+1}/${count_total.total})`;
-      // remove dreamy group and transition to screen 3
-      document.getElementById('dreamy-group')!.classList.remove('dreamy-group-show');
-      pageTransition('screen2', 'screen3');
-      console.log(`Showing photo ${count_total.count+1}/${count_total.total} ✅`);
-    })
-  } else {
-    try {
-      // grab text input
-      const prompt = gatherPrompt();
-      // transition screen
-      pageTransition('screen3', 'screen2');
-      // dreamy show animation
-      document.getElementById('dreamy')!.querySelector('p')!.textContent = prompt;
-      document.getElementById('dreamy2')!.querySelector('p')!.textContent = prompt;
-      document.getElementById('dreamy-group')!.classList.add('dreamy-group-show');
-      
-      // generated image return json object (this also make calls to the API, therefore generating new one)
-      response = generateImage(prompt)
-      // have to wait if response contains content, then proceed to load and show image
-      if (response) {
-        // store image count
-        count_total.count = 0;
-        count_total.total = (await response)?.total;
+    // when done, transition to screen 3
+    pageTransition('screen2', 'screen3');
+    console.log(response);
     
-        // grab image element and change src
-        const image = document.getElementById('img_output') as HTMLImageElement;
-        image.src = `data:image/jpeg;base64,${(await response)?.image_base64[count_total.count]}`;
-        // grab total images and replace content of regenerate btn
-        document.getElementById('regenerate')!.querySelector('span')!.textContent = `Regenerate (${count_total.count+1}/${count_total.total})`;
-        // remove dreamy group and transition to screen 3
-        document.getElementById('dreamy-group')!.classList.remove('dreamy-group-show');
-        pageTransition('screen2', 'screen3');
-        console.log(`Showing photo ${count_total.count+1}/${count_total.total} ✅`);
-      }
-    } catch (error) {
-      pageTransition('screen2', 'screen2');
-      console.error(error);
-      document.getElementById('subtitle')!.textContent = `We're having some issues generating your image 😞.<br>
-      Please hold as we making new request for you.`;
-      // loop again
-    }
-  }
+    // response is in JSON. Get just the base64 string.
+    const result = response.image_base64[0][0];
+
+    // replace the image src with the base64 image
+    const image = document.getElementById('img_output') as HTMLImageElement;
+    image.src = `data:image/jpeg;base64,${result}`;
+  });
 });
-
-
-
-
-
-
 
 
 
@@ -278,48 +139,3 @@ document.getElementById('adjust-prompt')!.addEventListener('click', () => {
   document.getElementById('gradient-overlay')!.classList.remove('gradient-overlay-show');
   pageTransition('screen3', 'screen1');
 });
-
-
-
-
-function gatherPrompt() {
-  const inputField = document.querySelector('textarea') as HTMLTextAreaElement;
-  const prompt = inputField.value;
-  console.log("Prompt: " + prompt);
-  return prompt;
-}
-
-function generateImage(prompt: string) {
-  console.log('Submitting query...');
-    
-    // make post request
-    return postRequest(prompt)?.then((result) => {
-      console.log(result);
-      // the result will come out as json string.
-      // Make how to convert it to json object to be displayed in HTML.
-      const jsonObject = JSON.parse(result) as { 
-        image_base64: string[], 
-        total: number 
-      };
-      return jsonObject;
-    });
-  } 
-
-
-
-
-
-
-function getSelectedRadioId(): string | undefined {
-  const selectedRadio = document.querySelector<HTMLInputElement>('input[name="group"]:checked');
-  if (selectedRadio) {
-    return selectedRadio.id;
-  }
-}
-
-
-      // const image = document.getElementById('img_output') as HTMLImageElement;
-      // image.src = `data:image/jpeg;base64,${result}`;
-      // document.getElementById('dreamy-group')!.classList.remove('dreamy-group-show');
-      // pageTransition('screen2', 'screen3');
-      // console.log('Query complete ✅');
