@@ -86,6 +86,9 @@ document.getElementById('submit')!.addEventListener('click', async () => {
   } else if (radioID === 'REALX') {
     console.log('Selected REALX');
     url = "https://api-imagen.ai.iziizz.com/flux-realism-generate";
+  } else if (radioID === 'SDIFF') {
+    console.log('Selected Stable DIffusion');
+    url = "https://api-imagen.ai.iziizz.com/sd-generate";
   }
 
   // make a POST request to the server
@@ -116,6 +119,12 @@ document.getElementById('submit')!.addEventListener('click', async () => {
     // replace the image src with the base64 image
     const image = document.getElementById('img_output') as HTMLImageElement;
     image.src = `data:image/jpeg;base64,${result}`;
+  }).fail(function (textStatus, errorThrown) {
+    console.error('Error:', textStatus, errorThrown);
+    alert('An error occurred while generating the image. Please try again, or try with other model.');
+    
+    // transition back to screen1 in case of error
+    pageTransition('screen2', 'screen1');
   });
 });
 
